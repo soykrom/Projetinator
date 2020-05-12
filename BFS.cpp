@@ -33,7 +33,7 @@ int deQueue(vector<int> &queue) {
 bool auxBFS(vector<vector<int>> adj, vector<int> &queue, vector<int> &prev, int vf) {
     int v = deQueue(queue);
     for(int u; u < (int) adj[v].size(); u++) {
-        if(prev[adj[v][u]]) continue;
+        if(prev[adj[v][u]] != -1) continue;
         else if(adj[v][u] == vf) {
             prev[vf] = v;
             return true;
@@ -63,7 +63,7 @@ int main() {
     adj.resize(V);
     prev.resize(V);
 
-    for(int i = 0; i < V; i++) prev[i] = 0;
+    for(int i = 0; i < V; i++) prev[i] = -1;
 
     addEdge(adj, 0, 1);
     addEdge(adj, 0, 2);
@@ -84,11 +84,10 @@ int main() {
     int i = 2;
     printf("O caminho mais rápido do vértice %d ao vértice %d é (por backtracking):\n", i, v);
     i = 0;
-    while(v != 2) {
+    while(v != -1) {
         printf("\t%d - Vértice %d\n", ++i, v);
         v = prev[v];
     }
-    printf("\t%d - Vértice %d\n", ++i, v);
 
     return 0;
 }
