@@ -100,7 +100,7 @@ int runEdmundo(vector<Vertex> &vertexes, int V) {
         int u;
         while(v != 0) {
             u = vertexes[v].nPrev;
-            for(int i = 0; i < vertexes[u].adj.size(); i++) {
+            for(int i = 0; i < (int) vertexes[u].adj.size(); i++) {
                 if(vertexes[u].adj[i] == v)
                     vertexes[u].adj.erase(vertexes[u].adj.begin() + i);
             }     
