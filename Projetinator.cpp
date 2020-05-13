@@ -9,7 +9,6 @@ using namespace std;
 
 typedef struct vertex {
     int run = 0;
-    bool infected = false;
     int nPrev = -1;
     vector<int> adj;
 } Vertex;
@@ -64,14 +63,14 @@ bool runBFS(vector<Vertex> &vertexes, vector<int> &queue, int cRun, int V) {
     for(int i = 0; i < (int) vertexes[v].adj.size(); i++) {
         int u = vertexes[v].adj[i];
 
-        if(cRun == vertexes[u].run || vertexes[u].infected) continue; //check if vertex can ve visited
+        if(cRun == vertexes[u].run) continue; //check if vertex can ve visited
 
         queue.push_back(u);
 
         vertexes[u].nPrev = v;
         vertexes[u].run = cRun;
 
-        if(u == V - 1) return true; //check if reached sink or BFS stopped
+        if(u == V - 1) return true; //check if reached sink
     }
 
     return false;
@@ -97,9 +96,14 @@ int runEdmundo(vector<Vertex> &vertexes, int V) {
         flux++;
         queue.clear();
 
-        int v = vertexes[V - 1].nPrev;
+        int v = V - 1;
+        int u;
         while(v != 0) {
-            vertexes[v].infected = true;        
+            u = vertexes[v].nPrev;
+            for(int i = 0; i < vertexes[u].adj.size(); i++) {
+                if(vertexes[u].adj[i] == v)
+                    vertexes[u].adj.erase(vertexes[u].adj.begin() + i);
+            }     
             v = vertexes[v].nPrev;
         }
         
