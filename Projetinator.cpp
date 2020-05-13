@@ -1,138 +1,61 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <limits> 
 
-using namespace std; 
+using namespace std;
 
-//int inf = numeric_limits<int>::max();
+void makeGraph(vector<vector<int>> &vertexes, int size, int xMax, int yMax) {
+    for(int i = 1; i <= size; i++) {
+        if(i % 2 == 1) {
+            vertexes[i].push_back(i + 1); //connect Vin to Vout
+        } else {
+            if(i > 2 * xMax) 
+                vertexes[i].push_back(i - 1 - 2 * xMax);
+            if(i % (2 * xMax) != 2)
+                vertexes[i].push_back(i - 3);
+            if(i % (2 * xMax) != 0)
+                vertexes[i].push_back(i + 1);
+            if(i <= 2 * xMax * (yMax - 1))
+                vertexes[i].push_back(i - 1 + 2 * xMax);
+        }
+    }
 
-typedef struct vertex {
-    int run = 0;
-    int nPrev = -1;
-    vector<int> adj;
-} Vertex;
-  
-  /*
-// Print adjacency list representaion ot graph 
-void printGraph(vector<Vertex> vertexes, int V) { 
+    int nSp, nCt;
+    cin >> nSp >> nCt;
+    int x, y;
+    for(int i = 0; i < nSp; i++) {
+        cin >> x >> y;
+        vertexes[2 * ((y - 1) * xMax + x)].push_back(size + 1);
+    }
+
+    for(int i = 0; i < nCt; i++) {
+        cin >> x >> y;
+        vertexes[0].push_back(2 * ((y - 1) * xMax + x - 1) + 1);
+    }
+
+}
+
+void printGraph(vector<vector<int>> &vertexes, int V) { 
     int v;
     for (int u = 0; u < V; u++) { 
         cout << "Node " << u << " makes an edge with \n"; 
-        for (v = 0; v < (int) vertexes[u].adj.size(); v++)  {
-            cout << "\tNode " << vertexes[u].adj[v] << ".\n";
+        for (v = 0; v < (int) vertexes[u].size(); v++)  {
+            cout << "\tNode " << vertexes[u][v] << ".\n";
         } 
         cout << "\n"; 
     } 
 } 
-*/
-int coordsToInt(int x, int y, int xMax) {
-    return (y - 1) * xMax + x;
-}
-
-void addEdge(vector<Vertex> &vertexes, int u, int v) { 
-    vertexes[u].adj.push_back(v);
-    vertexes[v].adj.push_back(u);
-} 
-
-void addExtremes(vector<Vertex> &vertexes, int v, int n, int xMax) {
-    int x, y;
-    for(int i = 0; i < n; i ++) {
-        cin >> x >> y;
-        addEdge(vertexes, v, coordsToInt(x, y, xMax));
-    }
-}
-
-void makeGraph(vector<Vertex> &vertexes, int xMax, int yMax) {
-    for(int y = 1; y <= yMax; y++) {
-        for(int x = 1; x <= xMax; x++) {
-            if(y != yMax)
-                addEdge(vertexes, coordsToInt(x, y, xMax), coordsToInt(x, y + 1, xMax));
-            if(x != xMax)
-                addEdge(vertexes, coordsToInt(x, y, xMax), coordsToInt(x + 1, y, xMax));
-
-        }
-    }
-}
-
-bool runBFS(vector<Vertex> &vertexes, vector<int> &queue, int cRun, int V) {
-    int v = queue[0];
-    queue.erase(queue.begin());
-
-
-    for(int i = 0; i < (int) vertexes[v].adj.size(); i++) {
-        int u = vertexes[v].adj[i];
-
-        if(cRun == vertexes[u].run) continue; //check if vertex can ve visited
-
-        queue.push_back(u);
-
-        vertexes[u].nPrev = v;
-        vertexes[u].run = cRun;
-
-        if(u == V - 1) return true; //check if reached sink
-    }
-
-    return false;
-}
-
-int runEdmundo(vector<Vertex> &vertexes, int V) {
-    vector<int> queue;
-    int cRun = 0;
-    int flux = 0;
-
-    while(true) {
-        bool flag = false;
-
-        cRun++;
-        queue.push_back(0);
-
-        while(!flag) {
-            flag = runBFS(vertexes, queue, cRun, V);
-            if((int) queue.size() == 0) return flux;
-        }
-
-
-        flux++;
-        queue.clear();
-
-        int v = V - 1;
-        int u;
-        while(v != 0) {
-            u = vertexes[v].nPrev;
-            for(int i = 0; i < (int) vertexes[u].adj.size(); i++) {
-                if(vertexes[u].adj[i] == v)
-                    vertexes[u].adj.erase(vertexes[u].adj.begin() + i);
-            }     
-            v = vertexes[v].nPrev;
-        }
-        
-    }
-
-}
 
 int main() {
-    int xMax, yMax, nSp, nCt;
+    int xMax, yMax;
     cin >> xMax >> yMax;
-    cin >> nSp >> nCt;
 
-    int V = xMax * yMax + 2;
-    vector<Vertex> vertexes;
+    int V = xMax * yMax; //number of vertexes in graph
+    vector<vector<int>> vertexes;
+    vertexes.resize(V * 2 + 2);
+    makeGraph(vertexes, V * 2, xMax, yMax);
 
-    for(int i = 0; i < V; i++) {
-        vertexes.push_back(Vertex());
-    }
-
-    addExtremes(vertexes, V - 1, nSp, xMax);
-    addExtremes(vertexes, 0, nCt, xMax);
-
-    makeGraph(vertexes, xMax, yMax);  
-
-    //printGraph(vertexes, V);  
-
-    int flux = runEdmundo(vertexes, V);
-
-    printf("%d\n", flux);
+    printGraph(vertexes, V * 2 + 2);
 
     return 0;
 }
