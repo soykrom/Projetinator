@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <queue>
 
 using namespace std;
 
@@ -40,58 +39,56 @@ void makeGraph(vector<vector<int>> &vertexes, int size, int xMax, int yMax) {
 
 
 int bfs(vector<vector<int>> &vertexVec, int maxV) {
-  prevVertex.clear();               //resets vector containig the previous vertexes;
-  for(int i = 0; i < maxV; i++){
-    prevVertex.push_back(-1);
-  }
+    prevVertex.clear();               //resets vector containig the previous vertexes;
+    for(int i = 0; i < maxV; i++)
+        prevVertex.push_back(-1);
 
-  prevVertex.at(0) = -2;
+    prevVertex.at(0) = -2;
 
-  queue<int> queue;
-  queue.push(0);                  //pushes the source;
+    vector<int> queue;
+    queue.push_back(0);                  //pushes the source;
+    int cont = 0;
+    while(cont != queue.size()) {             //stops execution when the q is empty or finds the sink;
+        int currentNode = queue.at(cont++);
 
-  while(!queue.empty()) {             //stops execution when the q is empty or finds the sink;
-    int currentNode = queue.front();
-    queue.pop();
+        for(unsigned int i = 0; i < vertexVec.at(currentNode).size(); i++) { //for every adjacent vertex;
+            int dest = vertexVec.at(currentNode).at(i);
 
-    for(unsigned int i = 0; i < vertexVec.at(currentNode).size(); i++){ //for every adjacent vertex;
-      int dest = vertexVec.at(currentNode).at(i);
-      if(prevVertex[dest] == -1){                                        //if doesn't have previous, adds to queue;
-        prevVertex[dest] = currentNode;
-        if(dest == (maxV - 1)){                                          //if the adjacent vertex is the sink, returns 1;
-          return 1;
+            if(prevVertex[dest] == -1) {                                        //if doesn't have previous, adds to queue;
+                prevVertex[dest] = currentNode;
+                if(dest == (maxV - 1))                                    //if the adjacent vertex is the sink, returns 1
+                    return 1;
+                queue.push_back(dest);
+            }
         }
-        queue.push(dest);
-      }
     }
-  }
-  return 0;
+    return 0;
 }
 
-int edmondsKarp(vector<vector<int>> &vertexVec, int maxV){
-  int maxFlow = 0;
+int edmondsKarp(vector<vector<int>> &vertexVec, int maxV) {
+    int maxFlow = 0;
 
-  while(true){
-    int flow = bfs(vertexVec, maxV);
-    if(flow == 0) {
-      break;
-    }
-    maxFlow += flow;
-    int currentNode = maxV - 1;
-
-    while(currentNode != 0){
-      int previousNode = prevVertex[currentNode];
-        for(unsigned int i = 0; i < vertexVec.at(previousNode).size(); i++) {
-          if(vertexVec.at(previousNode).at(i) == currentNode) {
-            vertexVec[previousNode].erase(vertexVec[previousNode].begin() + i);
-            vertexVec[currentNode].push_back(previousNode);
+    while(true) {
+        int flow = bfs(vertexVec, maxV);
+        if(flow == 0) {
             break;
-          }
         }
-      currentNode = previousNode;
+        maxFlow += flow;
+        int currentNode = maxV - 1;
+
+        while(currentNode != 0){
+            int previousNode = prevVertex[currentNode];
+            for(unsigned int i = 0; i < vertexVec.at(previousNode).size(); i++) {
+                if(vertexVec.at(previousNode).at(i) == currentNode) {
+                    vertexVec[previousNode].erase(vertexVec[previousNode].begin() + i);
+                    vertexVec[currentNode].push_back(previousNode);
+                    break;
+                }
+            }
+            currentNode = previousNode;
+        }
     }
-  }
-  return maxFlow;
+    return maxFlow;
 }
 
 int main() {
