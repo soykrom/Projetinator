@@ -48,7 +48,7 @@ int bfs(vector<vector<int>> &vertexVec, int maxV) {
     vector<int> queue;
     queue.push_back(0);                  //pushes the source;
     int cont = 0;
-    while(cont != queue.size()) {             //stops execution when the q is empty or finds the sink;
+    while(cont != (int) queue.size()) {             //stops execution when the q is empty or finds the sink;
         int currentNode = queue.at(cont++);
 
         for(unsigned int i = 0; i < vertexVec.at(currentNode).size(); i++) { //for every adjacent vertex;
